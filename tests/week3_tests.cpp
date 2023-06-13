@@ -136,35 +136,42 @@ TEST_CASE("Testing removePoint:", "[weight=1][ex1]")
     REQUIRE(graph == backupGraph);
   }
 }
-/*
+
 // ========================================================================
 // Test: graphBFS when the goal is unreachable
 // ========================================================================
 
-TEST_CASE("Testing graphBFS when the goal is unreachable:", "[weight=1][ex2][timeout=60000]") {
+TEST_CASE("Testing graphBFS when the goal is unreachable:", "[weight=1][ex2][timeout=60000]")
+{
 
   GridGraph graph;
   // We'll leave these points (and their attached edges) out of the graph.
-  std::unordered_set<IntPair> exclusionSet = {{6,0}, {0,5}};
+  std::unordered_set<IntPair> exclusionSet = {{6, 0}, {0, 5}};
 
   // Going to start with a 6x5 mesh.
   // Make vertical edges
-  for (int row=0; row<=5; row++) {
-    for (int col=0; col<=5; col++) {
-      auto p1 = IntPair(row,col);
-      auto p2 = IntPair(row+1,col);
-      if (exclusionSet.count(p1) || exclusionSet.count(p2)) continue;
-      graph.insertEdge(p1,p2);
+  for (int row = 0; row <= 5; row++)
+  {
+    for (int col = 0; col <= 5; col++)
+    {
+      auto p1 = IntPair(row, col);
+      auto p2 = IntPair(row + 1, col);
+      if (exclusionSet.count(p1) || exclusionSet.count(p2))
+        continue;
+      graph.insertEdge(p1, p2);
     }
   }
 
   // Make horizontal edges
-  for (int row=0; row<=6; row++) {
-    for (int col=0; col<=4; col++) {
-      auto p1 = IntPair(row,col);
-      auto p2 = IntPair(row,col+1);
-      if (exclusionSet.count(p1) || exclusionSet.count(p2)) continue;
-      graph.insertEdge(p1,p2);
+  for (int row = 0; row <= 6; row++)
+  {
+    for (int col = 0; col <= 4; col++)
+    {
+      auto p1 = IntPair(row, col);
+      auto p2 = IntPair(row, col + 1);
+      if (exclusionSet.count(p1) || exclusionSet.count(p2))
+        continue;
+      graph.insertEdge(p1, p2);
     }
   }
 
@@ -173,105 +180,114 @@ TEST_CASE("Testing graphBFS when the goal is unreachable:", "[weight=1][ex2][tim
   // to concisely enter all these nested objects. As long as the compiler can find constructors
   // that match the types we're using, it will be okay.
   std::vector<IntPairPair> edgesToRemove = {
-    {{0,1},{0,2}}, {{0,3},{1,3}}, {{1,1},{2,1}}, {{1,2},{1,3}}, {{1,3},{2,3}},
-    {{1,4},{2,4}}, {{2,0},{2,1}}, {{2,1},{2,2}}, {{2,2},{2,3}}, {{3,0},{3,1}},
-    {{3,2},{3,3}}, {{3,2},{4,2}}, {{3,3},{4,3}}, {{3,4},{3,5}}, {{4,0},{4,1}},
-    {{4,1},{4,2}}, {{4,3},{5,3}}, {{4,4},{4,5}}, {{4,4},{5,4}}, {{4,5},{5,5}},
-    {{5,1},{5,2}}, {{6,1},{6,2}}, {{6,2},{6,3}}, {{6,4},{6,5}},
-    // Removing this last edge separates the graph into two connected components,
-    // where the start no longer has a path to the goal:
-    {{0,2},{0,3}}
-  };
+      {{0, 1}, {0, 2}}, {{0, 3}, {1, 3}}, {{1, 1}, {2, 1}}, {{1, 2}, {1, 3}}, {{1, 3}, {2, 3}}, {{1, 4}, {2, 4}}, {{2, 0}, {2, 1}}, {{2, 1}, {2, 2}}, {{2, 2}, {2, 3}}, {{3, 0}, {3, 1}}, {{3, 2}, {3, 3}}, {{3, 2}, {4, 2}}, {{3, 3}, {4, 3}}, {{3, 4}, {3, 5}}, {{4, 0}, {4, 1}}, {{4, 1}, {4, 2}}, {{4, 3}, {5, 3}}, {{4, 4}, {4, 5}}, {{4, 4}, {5, 4}}, {{4, 5}, {5, 5}}, {{5, 1}, {5, 2}}, {{6, 1}, {6, 2}}, {{6, 2}, {6, 3}}, {{6, 4}, {6, 5}},
+      // Removing this last edge separates the graph into two connected components,
+      // where the start no longer has a path to the goal:
+      {{0, 2}, {0, 3}}};
 
-  for (auto e : edgesToRemove) {
+  for (auto e : edgesToRemove)
+  {
     auto p1 = e.first;
     auto p2 = e.second;
-    graph.removeEdge(p1,p2);
+    graph.removeEdge(p1, p2);
   }
 
-  const auto maze_start = IntPair(0,0);
-  const auto maze_goal = IntPair(6,5);
+  const auto maze_start = IntPair(0, 0);
+  const auto maze_goal = IntPair(6, 5);
 
-  std::cout << std::endl << "Now testing graphBFS when the goal is unreachable." << std::endl
-    << "This may take several seconds and display a warning (which is OK)." << std::endl
-    << "If you want to cancel the test, press this key combination: Ctrl c" << std::endl << std::endl;
+  std::cout << std::endl
+            << "Now testing graphBFS when the goal is unreachable." << std::endl
+            << "This may take several seconds and display a warning (which is OK)." << std::endl
+            << "If you want to cancel the test, press this key combination: Ctrl c" << std::endl
+            << std::endl;
   std::list<IntPair> path = graphBFS(maze_start, maze_goal, graph);
 
-  SECTION("Should return empty path when goal unreachable") {
+  SECTION("Should return empty path when goal unreachable")
+  {
     REQUIRE(path.empty());
   }
-
 }
 
 // ========================================================================
 // Test: graphBFS when start==goal
 // ========================================================================
 
-TEST_CASE("Testing graphBFS when start==goal:", "[weight=1][ex2]") {
+TEST_CASE("Testing graphBFS when start==goal:", "[weight=1][ex2]")
+{
 
   GridGraph graph;
 
-  std::vector<std::vector<int>> edgesToInsert = {{0,0,0,1}, {0,1,0,2}};
-  for (auto e : edgesToInsert) {
-    auto p1 = IntPair(e[0],e[1]);
-    auto p2 = IntPair(e[2],e[3]);
-    graph.insertEdge(p1,p2);
+  std::vector<std::vector<int>> edgesToInsert = {{0, 0, 0, 1}, {0, 1, 0, 2}};
+  for (auto e : edgesToInsert)
+  {
+    auto p1 = IntPair(e[0], e[1]);
+    auto p2 = IntPair(e[2], e[3]);
+    graph.insertEdge(p1, p2);
   }
 
-  const auto maze_start = IntPair(0,0);
+  const auto maze_start = IntPair(0, 0);
   const auto maze_goal = maze_start;
   std::list<IntPair> path = graphBFS(maze_start, maze_goal, graph);
 
-  SECTION("Test configuration sanity check") {
+  SECTION("Test configuration sanity check")
+  {
     REQUIRE(maze_start == maze_goal);
   }
 
-  SECTION("Should not return empty path when start==goal") {
+  SECTION("Should not return empty path when start==goal")
+  {
     REQUIRE(!path.empty());
   }
 
-  SECTION("Should return path containing only the start") {
+  SECTION("Should return path containing only the start")
+  {
     REQUIRE(maze_start == maze_goal);
     REQUIRE(path.front() == maze_start);
     REQUIRE(path.back() == maze_goal);
   }
 
   // somewhat redundant
-  SECTION("Should return path of size 1") {
+  SECTION("Should return path of size 1")
+  {
     REQUIRE(path.size() == 1);
   }
-
 }
-
 
 // ========================================================================
 // Test: graphBFS with normal maze
 // ========================================================================
 
-TEST_CASE("Testing graphBFS when a path can be found:", "[weight=1][ex2]") {
+TEST_CASE("Testing graphBFS when a path can be found:", "[weight=1][ex2]")
+{
 
   GridGraph graph;
   // We'll leave these points (and their attached edges) out of the graph.
-  std::unordered_set<IntPair> exclusionSet = {{6,0}, {0,5}};
+  std::unordered_set<IntPair> exclusionSet = {{6, 0}, {0, 5}};
 
   // Going to start with a 6x5 mesh.
   // Make vertical edges
-  for (int row=0; row<=5; row++) {
-    for (int col=0; col<=5; col++) {
-      auto p1 = IntPair(row,col);
-      auto p2 = IntPair(row+1,col);
-      if (exclusionSet.count(p1) || exclusionSet.count(p2)) continue;
-      graph.insertEdge(p1,p2);
+  for (int row = 0; row <= 5; row++)
+  {
+    for (int col = 0; col <= 5; col++)
+    {
+      auto p1 = IntPair(row, col);
+      auto p2 = IntPair(row + 1, col);
+      if (exclusionSet.count(p1) || exclusionSet.count(p2))
+        continue;
+      graph.insertEdge(p1, p2);
     }
   }
 
   // Make horizontal edges
-  for (int row=0; row<=6; row++) {
-    for (int col=0; col<=4; col++) {
-      auto p1 = IntPair(row,col);
-      auto p2 = IntPair(row,col+1);
-      if (exclusionSet.count(p1) || exclusionSet.count(p2)) continue;
-      graph.insertEdge(p1,p2);
+  for (int row = 0; row <= 6; row++)
+  {
+    for (int col = 0; col <= 4; col++)
+    {
+      auto p1 = IntPair(row, col);
+      auto p2 = IntPair(row, col + 1);
+      if (exclusionSet.count(p1) || exclusionSet.count(p2))
+        continue;
+      graph.insertEdge(p1, p2);
     }
   }
 
@@ -280,38 +296,38 @@ TEST_CASE("Testing graphBFS when a path can be found:", "[weight=1][ex2]") {
   // to concisely enter all these nested objects. As long as the compiler can find constructors
   // that match the types we're using, it will be okay.
   std::vector<IntPairPair> edgesToRemove = {
-    {{0,1},{0,2}}, {{0,3},{1,3}}, {{1,1},{2,1}}, {{1,2},{1,3}}, {{1,3},{2,3}},
-    {{1,4},{2,4}}, {{2,0},{2,1}}, {{2,1},{2,2}}, {{2,2},{2,3}}, {{3,0},{3,1}},
-    {{3,2},{3,3}}, {{3,2},{4,2}}, {{3,3},{4,3}}, {{3,4},{3,5}}, {{4,0},{4,1}},
-    {{4,1},{4,2}}, {{4,3},{5,3}}, {{4,4},{4,5}}, {{4,4},{5,4}}, {{4,5},{5,5}},
-    {{5,1},{5,2}}, {{6,1},{6,2}}, {{6,2},{6,3}}, {{6,4},{6,5}}
-  };
+      {{0, 1}, {0, 2}}, {{0, 3}, {1, 3}}, {{1, 1}, {2, 1}}, {{1, 2}, {1, 3}}, {{1, 3}, {2, 3}}, {{1, 4}, {2, 4}}, {{2, 0}, {2, 1}}, {{2, 1}, {2, 2}}, {{2, 2}, {2, 3}}, {{3, 0}, {3, 1}}, {{3, 2}, {3, 3}}, {{3, 2}, {4, 2}}, {{3, 3}, {4, 3}}, {{3, 4}, {3, 5}}, {{4, 0}, {4, 1}}, {{4, 1}, {4, 2}}, {{4, 3}, {5, 3}}, {{4, 4}, {4, 5}}, {{4, 4}, {5, 4}}, {{4, 5}, {5, 5}}, {{5, 1}, {5, 2}}, {{6, 1}, {6, 2}}, {{6, 2}, {6, 3}}, {{6, 4}, {6, 5}}};
 
-  for (auto e : edgesToRemove) {
+  for (auto e : edgesToRemove)
+  {
     auto p1 = e.first;
     auto p2 = e.second;
-    graph.removeEdge(p1,p2);
+    graph.removeEdge(p1, p2);
   }
 
-  const auto maze_start = IntPair(0,0);
-  const auto maze_goal = IntPair(6,5);
+  const auto maze_start = IntPair(0, 0);
+  const auto maze_goal = IntPair(6, 5);
   std::list<IntPair> path = graphBFS(maze_start, maze_goal, graph);
 
-  SECTION("Path should not be empty") {
+  SECTION("Path should not be empty")
+  {
     REQUIRE(!path.empty());
   };
 
-  SECTION("Path should have ended at the goal") {
+  SECTION("Path should have ended at the goal")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.back() == maze_goal);
   };
 
-  SECTION("Path should have begun at the start") {
+  SECTION("Path should have begun at the start")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == maze_start);
   };
 
-  SECTION("Path can only use existing edges in the graph") {
+  SECTION("Path can only use existing edges in the graph")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == maze_start);
     REQUIRE(path.back() == maze_goal);
@@ -327,18 +343,20 @@ TEST_CASE("Testing graphBFS when a path can be found:", "[weight=1][ex2]") {
     // Walk through subsequent pairs and add edges
     int num_steps = 0;
     auto p1 = path_start;
-    while (!working_path.empty()) {
+    while (!working_path.empty())
+    {
       auto p2 = working_path.front();
       working_path.pop_front();
-      newGraph.insertEdge(p1,p2);
-      REQUIRE(graph.hasEdge(p1,p2));
+      newGraph.insertEdge(p1, p2);
+      REQUIRE(graph.hasEdge(p1, p2));
       // step forward
       num_steps++;
       p1 = p2;
     }
   }
 
-  SECTION("Path should be the shortest solution possible") {
+  SECTION("Path should be the shortest solution possible")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == maze_start);
     REQUIRE(path.back() == maze_goal);
@@ -354,11 +372,12 @@ TEST_CASE("Testing graphBFS when a path can be found:", "[weight=1][ex2]") {
     // Walk through subsequent pairs and add edges
     int num_steps = 0;
     auto p1 = path_start;
-    while (!working_path.empty()) {
+    while (!working_path.empty())
+    {
       auto p2 = working_path.front();
       working_path.pop_front();
-      newGraph.insertEdge(p1,p2);
-      REQUIRE(graph.hasEdge(p1,p2));
+      newGraph.insertEdge(p1, p2);
+      REQUIRE(graph.hasEdge(p1, p2));
       // step forward
       num_steps++;
       p1 = p2;
@@ -366,89 +385,100 @@ TEST_CASE("Testing graphBFS when a path can be found:", "[weight=1][ex2]") {
 
     REQUIRE(num_steps == 19);
   }
-
 }
 
 // ========================================================================
 // Test: puzzleBFS when the goal is unreachable (puzzle can't be solved)
 // ========================================================================
 
-TEST_CASE("Testing puzzleBFS when the goal is unreachable (puzzle can't be solved):", "[weight=1][ex3][timeout=60000]") {
+TEST_CASE("Testing puzzleBFS when the goal is unreachable (puzzle can't be solved):", "[weight=1][ex3][timeout=60000]")
+{
 
-  const PuzzleState puzzle_start({1,3,2,4,5,6,7,8,9});
-  const PuzzleState puzzle_goal({1,2,3,4,5,6,7,8,9});
+  const PuzzleState puzzle_start({1, 3, 2, 4, 5, 6, 7, 8, 9});
+  const PuzzleState puzzle_goal({1, 2, 3, 4, 5, 6, 7, 8, 9});
 
-  std::cout << std::endl << "Now testing puzzleBFS when the goal is unreachable." << std::endl
-    << "This may take several seconds and display a warning (which is OK)." << std::endl
-    << "If you want to cancel the test, press this key combination: Ctrl c" << std::endl << std::endl;
+  std::cout << std::endl
+            << "Now testing puzzleBFS when the goal is unreachable." << std::endl
+            << "This may take several seconds and display a warning (which is OK)." << std::endl
+            << "If you want to cancel the test, press this key combination: Ctrl c" << std::endl
+            << std::endl;
 
   std::list<PuzzleState> path = puzzleBFS(puzzle_start, puzzle_goal);
 
-  SECTION("Path should be empty") {
+  SECTION("Path should be empty")
+  {
     REQUIRE(path.empty());
   }
-
 }
 
 // ========================================================================
 // Test: puzzleBFS when start==goal
 // ========================================================================
 
-TEST_CASE("Testing puzzleBFS when start==goal:", "[weight=1][ex3]") {
+TEST_CASE("Testing puzzleBFS when start==goal:", "[weight=1][ex3]")
+{
 
-  const PuzzleState puzzle_start({1,2,3,4,5,6,7,8,9});
+  const PuzzleState puzzle_start({1, 2, 3, 4, 5, 6, 7, 8, 9});
   const PuzzleState puzzle_goal = puzzle_start;
 
   std::list<PuzzleState> path = puzzleBFS(puzzle_start, puzzle_goal);
 
-  SECTION("Test configuration sanity check") {
+  SECTION("Test configuration sanity check")
+  {
     REQUIRE(puzzle_start == puzzle_goal);
   }
 
-  SECTION("Should not return empty path when start==goal") {
+  SECTION("Should not return empty path when start==goal")
+  {
     REQUIRE(!path.empty());
   }
 
-  SECTION("Should return path containing only the start") {
+  SECTION("Should return path containing only the start")
+  {
     REQUIRE(puzzle_start == puzzle_goal);
     REQUIRE(path.front() == puzzle_start);
     REQUIRE(path.back() == puzzle_goal);
   }
 
   // somewhat redundant
-  SECTION("Should return path of size 1") {
+  SECTION("Should return path of size 1")
+  {
     REQUIRE(path.size() == 1);
   }
-
 }
 
 // ========================================================================
 // Test: puzzleBFS with a simple puzzle
 // ========================================================================
 
-TEST_CASE("Testing puzzleBFS when there is a solution:", "[weight=1][ex3]") {
+TEST_CASE("Testing puzzleBFS when there is a solution:", "[weight=1][ex3]")
+{
 
-  const PuzzleState puzzle_start({1,2,3,4,6,9,7,5,8});
-  const PuzzleState puzzle_goal({1,2,3,4,5,6,7,8,9});
+  const PuzzleState puzzle_start({1, 2, 3, 4, 6, 9, 7, 5, 8});
+  const PuzzleState puzzle_goal({1, 2, 3, 4, 5, 6, 7, 8, 9});
   const int CORRECT_STEPS = 3;
 
   std::list<PuzzleState> path = puzzleBFS(puzzle_start, puzzle_goal);
 
-  SECTION("Path should not be empty") {
+  SECTION("Path should not be empty")
+  {
     REQUIRE(!path.empty());
   };
 
-  SECTION("Path should have ended at the goal") {
+  SECTION("Path should have ended at the goal")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.back() == puzzle_goal);
   };
 
-  SECTION("Path should have begun at the start") {
+  SECTION("Path should have begun at the start")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == puzzle_start);
   };
 
-  SECTION("Solution can only use valid puzzle moves") {
+  SECTION("Solution can only use valid puzzle moves")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == puzzle_start);
     REQUIRE(path.back() == puzzle_goal);
@@ -461,7 +491,8 @@ TEST_CASE("Testing puzzleBFS when there is a solution:", "[weight=1][ex3]") {
     working_path.pop_front();
     auto state1 = path_start;
 
-    while (!working_path.empty()) {
+    while (!working_path.empty())
+    {
       auto state2 = working_path.front();
       working_path.pop_front();
       REQUIRE(state1.isAdjacent(state2));
@@ -471,7 +502,8 @@ TEST_CASE("Testing puzzleBFS when there is a solution:", "[weight=1][ex3]") {
     }
   }
 
-  SECTION("Should find the shortest solution") {
+  SECTION("Should find the shortest solution")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == puzzle_start);
     REQUIRE(path.back() == puzzle_goal);
@@ -484,7 +516,8 @@ TEST_CASE("Testing puzzleBFS when there is a solution:", "[weight=1][ex3]") {
     working_path.pop_front();
     auto state1 = path_start;
 
-    while (!working_path.empty()) {
+    while (!working_path.empty())
+    {
       auto state2 = working_path.front();
       working_path.pop_front();
       REQUIRE(state1.isAdjacent(state2));
@@ -495,36 +528,40 @@ TEST_CASE("Testing puzzleBFS when there is a solution:", "[weight=1][ex3]") {
 
     REQUIRE(num_steps == CORRECT_STEPS);
   }
-
 }
 
 // ========================================================================
 // Test: puzzleBFS with a harder puzzle
 // ========================================================================
 
-TEST_CASE("Testing puzzleBFS on a harder puzzle:", "[weight=1][ex3]") {
+TEST_CASE("Testing puzzleBFS on a harder puzzle:", "[weight=1][ex3]")
+{
 
-  const PuzzleState puzzle_start({9,2,6,1,3,5,4,7,8});
-  const PuzzleState puzzle_goal({1,2,3,4,5,6,7,8,9});
+  const PuzzleState puzzle_start({9, 2, 6, 1, 3, 5, 4, 7, 8});
+  const PuzzleState puzzle_goal({1, 2, 3, 4, 5, 6, 7, 8, 9});
   const int CORRECT_STEPS = 10;
 
   std::list<PuzzleState> path = puzzleBFS(puzzle_start, puzzle_goal);
 
-  SECTION("Path should not be empty") {
+  SECTION("Path should not be empty")
+  {
     REQUIRE(!path.empty());
   };
 
-  SECTION("Path should have ended at the goal") {
+  SECTION("Path should have ended at the goal")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.back() == puzzle_goal);
   };
 
-  SECTION("Path should have begun at the start") {
+  SECTION("Path should have begun at the start")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == puzzle_start);
   };
 
-  SECTION("Solution can only use valid puzzle moves") {
+  SECTION("Solution can only use valid puzzle moves")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == puzzle_start);
     REQUIRE(path.back() == puzzle_goal);
@@ -537,7 +574,8 @@ TEST_CASE("Testing puzzleBFS on a harder puzzle:", "[weight=1][ex3]") {
     working_path.pop_front();
     auto state1 = path_start;
 
-    while (!working_path.empty()) {
+    while (!working_path.empty())
+    {
       auto state2 = working_path.front();
       working_path.pop_front();
       REQUIRE(state1.isAdjacent(state2));
@@ -547,7 +585,8 @@ TEST_CASE("Testing puzzleBFS on a harder puzzle:", "[weight=1][ex3]") {
     }
   }
 
-  SECTION("Should find the shortest solution") {
+  SECTION("Should find the shortest solution")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == puzzle_start);
     REQUIRE(path.back() == puzzle_goal);
@@ -560,7 +599,8 @@ TEST_CASE("Testing puzzleBFS on a harder puzzle:", "[weight=1][ex3]") {
     working_path.pop_front();
     auto state1 = path_start;
 
-    while (!working_path.empty()) {
+    while (!working_path.empty())
+    {
       auto state2 = working_path.front();
       working_path.pop_front();
       REQUIRE(state1.isAdjacent(state2));
@@ -571,22 +611,23 @@ TEST_CASE("Testing puzzleBFS on a harder puzzle:", "[weight=1][ex3]") {
 
     REQUIRE(num_steps == CORRECT_STEPS);
   }
-
 }
 
 // ========================================================================
 // Test: puzzleBFS with a random puzzle
 // ========================================================================
 
-TEST_CASE("Testing puzzleBFS on a random puzzle:", "[weight=1][ex3]") {
+TEST_CASE("Testing puzzleBFS on a random puzzle:", "[weight=1][ex3]")
+{
 
-  const PuzzleState puzzle_goal({1,2,3,4,5,6,7,8,9});
+  const PuzzleState puzzle_goal({1, 2, 3, 4, 5, 6, 7, 8, 9});
   const int MAX_STEPS = 10;
   const PuzzleState puzzle_start = PuzzleState::randomizePuzzle(puzzle_goal, MAX_STEPS);
 
   std::list<PuzzleState> path = puzzleBFS(puzzle_start, puzzle_goal);
 
-  SECTION("Should find the shortest solution") {
+  SECTION("Should find the shortest solution")
+  {
     REQUIRE(!path.empty());
     REQUIRE(path.front() == puzzle_start);
     REQUIRE(path.back() == puzzle_goal);
@@ -599,7 +640,8 @@ TEST_CASE("Testing puzzleBFS on a random puzzle:", "[weight=1][ex3]") {
     working_path.pop_front();
     auto state1 = path_start;
 
-    while (!working_path.empty()) {
+    while (!working_path.empty())
+    {
       auto state2 = working_path.front();
       working_path.pop_front();
       REQUIRE(state1.isAdjacent(state2));
@@ -610,8 +652,4 @@ TEST_CASE("Testing puzzleBFS on a random puzzle:", "[weight=1][ex3]") {
 
     REQUIRE(num_steps <= MAX_STEPS);
   }
-
 }
-
-
-*/
